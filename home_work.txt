@@ -1,0 +1,270 @@
+XNDIR 1
+
+CREATE TABLE books (id SERIAL PRIMARY KEY, title VARCHAR(250),
+author_id INT, year_published INT,
+genre VARCHAR(250) DEFAULT CURRENT_TIMESTAMP NOT NULL);
+
+CREATE TABLE authors (id SERIAL PRIMARY KEY, name VARCHAR(100), country VARCHAR(2));
+
+CREATE TABLE borrowers (id SERIAL PRIMARY KEY, name VARCHAR(100), phone BIGINT);
+
+CREATE TABLE loans (id SERIAL PRIMARY KEY, book_id INT, borrower_id INT, loan_date TIMESTAMP, return_date DATE);
+
+INSERT INTO books (title, author_id, year_published, genre) VALUES
+('Мастер и Маргарита', 1, 1967, 'Роман'),
+('Идиот', 2, 1869, 'Роман'),
+('Стихотворения и поэмы', 3, 1925, 'Поэзия'),
+('Война и мир', 4, 1869, 'Роман'),
+('1984', 5, 1949, 'Антиутопия');
+
+INSERT INTO authors (name, country) VALUES
+('Булгаков М.А.', 'RU'),
+('Достоевский Ф.М.', 'RU'),
+('Есенин С.А.', 'RU'),
+('Толстой Л.Н.', 'RU'),
+('Оруэлл Дж.', 'UK');
+
+INSERT INTO borrowers (name, phone) VALUES
+('Алексей Иванов', 79161234567),
+('Мария Смирнова', 79161112233),
+('Игорь Кузнецов', 79261234567),
+('Елена Орлова', 79035556677),
+('Дмитрий Петров', 79049998877);
+
+INSERT INTO loans (book_id, borrower_id, loan_date, return_date) VALUES
+(1, 1, '2025-07-10 10:00:00', '2025-07-20'),
+(3, 2, '2025-07-05 14:30:00', '2025-07-15'),
+(2, 3, '2025-07-11 09:00:00', NULL),
+(5, 4, '2025-07-01 12:00:00', '2025-07-08'),
+(4, 5, '2025-07-12 11:00:00', NULL);
+
+1 - |
+SELECT authors.name AS authors,books.title AS book_titles
+FROM books
+INNER JOIN authors ON books.author_id = authors.id;
+
+2 - |
+SELECT title, year_published
+FROM books
+
+3 - |
+SELECT borrowers.name
+FROM borrowers
+INNER JOIN loans ON loans.borrower_id = borrowers.id;
+
+4 - |
+SELECT books.title
+FROM loans
+INNER JOIN books ON loans.book_id = books.id
+WHERE loans.return_date IS NULL;
+
+-----------------------------------------------------------------
+
+XNDIR 2
+
+CREATE TABLE users (id SERIAL PRIMARY KEY, name VARCHAR(250), email VARCHAR(250));
+
+CREATE TABLE movies (id SERIAL PRIMARY KEY, title VARCHAR(250), release_year INT, genre VARCHAR(250));
+
+CREATE TABLE watch_history (id SERIAL PRIMARY KEY, user_id INT, movie_id INT, watch_date TIMESTAMP, rating NUMERIC);
+
+INSERT INTO users (name, email) VALUES
+('Alice Johnson', 'alice.johnson@example.com'),
+('Bob Smith', 'bob.smith@example.com'),
+('Carol Lee', 'carol.lee@example.com');
+
+INSERT INTO movies (title, release_year, genre) VALUES
+('Inception', 2010, 'Science Fiction'),
+('The Godfather', 1972, 'Crime'),
+('Forrest Gump', 1994, 'Drama'),
+('The Dark Knight', 2008, 'Action'),
+('Pulp Fiction', 1994, 'Crime');
+
+INSERT INTO watch_history (user_id, movie_id, watch_date, rating) VALUES
+(1, 1, '2025-07-23 20:00:00', 9.5),
+(1, 3, '2025-07-24 15:30:00', 8.0),
+(2, 2, '2025-07-22 19:45:00', 9.1),
+(2, 4, '2025-07-23 21:10:00', 9.0),
+(2, 1, '2025-07-24 14:00:00', 8.5),
+(3, 5, '2025-07-24 16:20:00', 6.4);
+
+1 - |
+SELECT users.name,
+COUNT(watch_history.movie_id) AS movies_watched
+FROM users
+LEFT JOIN watch_history ON users.id = watch_history.user_id
+GROUP BY users.id,users.name
+ORDER BY movies_watched DESC LIMIT 1;
+
+2 - |
+SELECT movies.title,
+ROUND(MAX(watch_history.rating), 1) AS max_rating
+FROM movies
+INNER JOIN watch_history ON movies.id = watch_history.movie_id
+GROUP BY movies.title
+ORDER BY max_rating DESC;
+
+3 - |
+SELECT movies.genre,
+ROUND(AVG(watch_history.rating), 1) AS avg_rating
+FROM movies
+INNER JOIN watch_history ON movies.id = watch_history.movie_id
+GROUP BY movies.genre
+ORDER BY AVG_RATING DESC
+
+4 - |
+SELECT movies.title, watch_history.watch_date
+FROM movies
+INNER JOIN watch_history ON movies.id = watch_history.movie_id
+ORDER BY watch_history.watch_date DESC;
+
+-----------------------------------------------------------------
+
+XNDIR 3
+
+CREATE TABLE customers (id SERIAL PRIMARY KEY, name VARCHAR(250), phone BIGINT);
+
+CREATE TABLE orders (id SERIAL PRIMARY KEY,customer_id INT,
+order_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP);
+
+CREATE TABLE pizzas (id SERIAL PRIMARY KEY, name VARCHAR(250), price NUMERIC);
+
+CREATE TABLE order_items (id SERIAL PRIMARY KEY, order_id INT, pizza_id INT, quantity INT,created_at TIMESTAMP);
+
+INSERT INTO customers (name, phone) VALUES
+('Alice Johnson', 37491111222),
+('Bob Smith', 37499123456),
+('Charlie Lee', 37495111222),
+('Diana Prince', 37493555666),
+('Ethan Hunt', 37494447788);
+
+INSERT INTO pizzas (name, price) VALUES
+('Margherita', 3500.00),
+('Pepperoni', 4200.00),
+('Hawaiian', 4000.00),
+('Vegetarian', 3700.00),
+('BBQ Chicken', 4500.00);
+
+INSERT INTO orders (customer_id, order_date) VALUES
+(1, CURRENT_TIMESTAMP),
+(2, CURRENT_TIMESTAMP - INTERVAL '1 day'),
+(3, CURRENT_TIMESTAMP - INTERVAL '2 days'),
+(4, CURRENT_TIMESTAMP - INTERVAL '3 days'),
+(5, CURRENT_TIMESTAMP - INTERVAL '4 days'),
+(1, CURRENT_TIMESTAMP - INTERVAL '5 days'),
+(2, CURRENT_TIMESTAMP - INTERVAL '6 days'),
+(3, CURRENT_TIMESTAMP - INTERVAL '7 days'),
+(4, CURRENT_TIMESTAMP - INTERVAL '8 days'),
+(5, CURRENT_TIMESTAMP - INTERVAL '9 days'),
+(1, CURRENT_TIMESTAMP - INTERVAL '10 days'),
+(2, CURRENT_TIMESTAMP - INTERVAL '11 days'),
+(3, CURRENT_TIMESTAMP - INTERVAL '12 days'),
+(4, CURRENT_TIMESTAMP - INTERVAL '13 days'),
+(5, CURRENT_TIMESTAMP - INTERVAL '14 days');
+
+INSERT INTO order_items (order_id, pizza_id, quantity, created_at) VALUES
+(1, 1, 2, CURRENT_TIMESTAMP),
+(1, 3, 1, CURRENT_TIMESTAMP),
+(2, 2, 1, CURRENT_TIMESTAMP),
+(3, 5, 3, CURRENT_TIMESTAMP),
+(4, 4, 1, CURRENT_TIMESTAMP),
+(4, 1, 2, CURRENT_TIMESTAMP),
+(5, 3, 2, CURRENT_TIMESTAMP),
+(6, 1, 1, CURRENT_TIMESTAMP),
+(6, 2, 1, CURRENT_TIMESTAMP),
+(6, 5, 1, CURRENT_TIMESTAMP),
+(7, 4, 2, CURRENT_TIMESTAMP),
+(8, 3, 1, CURRENT_TIMESTAMP),
+(9, 2, 2, CURRENT_TIMESTAMP),
+(10, 1, 1, CURRENT_TIMESTAMP),
+(11, 5, 1, CURRENT_TIMESTAMP),
+(12, 4, 1, CURRENT_TIMESTAMP),
+(13, 3, 2, CURRENT_TIMESTAMP),
+(14, 2, 1, CURRENT_TIMESTAMP),
+(15, 1, 3, CURRENT_TIMESTAMP);
+
+1 - |
+SELECT customers.name,
+COUNT(orders.id) AS number_of_orders
+FROM customers
+LEFT JOIN orders ON customers.id = orders.customer_id
+GROUP BY customers.id, customers.name
+ORDER BY number_of_orders DESC;
+
+2 - |
+SELECT orders.id AS order_id,customers.name AS customer_name,
+SUM(pizzas.price * order_items.quantity) AS total_price
+FROM orders
+INNER JOIN order_items ON orders.id = order_items.order_id
+INNER JOIN pizzas ON order_items.pizza_id = pizzas.id
+INNER JOIN customers ON orders.customer_id = customers.id
+GROUP BY orders.id, customers.name
+ORDER BY total_price desc limit 10;
+
+3 - |
+SELECT pizzas.name AS pizza_name,
+SUM(order_items.quantity) AS total_quantity
+FROM pizzas
+INNER JOIN order_items ON order_items.pizza_id = pizzas.id
+GROUP BY pizzas.name
+ORDER BY total_quantity DESC;
+
+-----------------------------------------------------------------
+
+XNDIR 4
+
+CREATE TABLE students (id SERIAL PRIMARY KEY, name VARCHAR(250), email VARCHAR(250));
+
+CREATE TABLE courses (id SERIAL PRIMARY KEY, title VARCHAR(250), description TEXT);
+
+CREATE TABLE enrollments (id SERIAL PRIMARY KEY, student_id INT, course_id INT, enrollment_date TIMESTAMP);
+
+INSERT INTO students (name, email) VALUES
+('Alice Johnson', 'alice@example.com'),
+('Bob Smith', 'bob@example.com'),
+('Charlie Lee', 'charlie@example.com'),
+('Diana Prince', 'diana@example.com');
+
+INSERT INTO courses (title, description) VALUES
+('SQL Basics', 'Learn the fundamentals of SQL.'),
+('Advanced JavaScript', 'Deep dive into JavaScript.'),
+('Python for Data Science', 'Analyze data with Python.'),
+('Web Development', 'Learn HTML, CSS, and JS.'),
+('Machine Learning', 'Intro to ML concepts.');
+
+INSERT INTO enrollments (student_id, course_id, enrollment_date) VALUES
+(1, 1, '2025-07-01 09:00:00'),
+(1, 3, '2025-07-02 09:30:00'),
+(1, 5, '2025-07-03 10:00:00'),
+(2, 2, '2025-07-01 11:00:00'),
+(2, 4, '2025-07-03 14:00:00'),
+(3, 3, '2025-07-05 16:00:00'),
+(4, 1, '2025-07-01 10:15:00'),
+(4, 2, '2025-07-02 12:00:00'),
+(4, 3, '2025-07-03 13:45:00'),
+(4, 4, '2025-07-04 15:00:00'),
+(4, 5, '2025-07-05 17:30:00');
+
+1 -|
+SELECT students.name,
+COUNT(enrollments.course_id) AS all_courses
+FROM students
+INNER JOIN enrollments ON enrollments.student_id = students.id
+GROUP BY students.name
+ORDER BY all_courses DESC
+
+2 - |
+SELECT courses.title,
+COUNT(enrollments.student_id) AS count_students
+FROM courses
+INNER JOIN enrollments ON enrollments.course_id = courses.id
+GROUP BY courses.title
+ORDER BY count_students DESC
+
+3 - |
+SELECT students.name,courses.title AS course_title
+FROM students
+JOIN enrollments ON enrollments.student_id = students.id
+JOIN courses ON courses.id = enrollments.course_id
+WHERE students.name LIKE 'Alice %'
+ORDER BY course_title;
