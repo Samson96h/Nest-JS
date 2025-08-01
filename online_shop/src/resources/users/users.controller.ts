@@ -1,31 +1,28 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, UsePipes, ValidationPipe } from "@nestjs/common";
-import { UsersService } from "./users.service";
-import { UserDTO } from "./dto/users.dto";
+import { Body, Controller, Get, Param, Post, Delete } from '@nestjs/common';
+import { UsersService } from './users.service';
+import { UserDTO } from './dto/users.dto';
 
 @Controller('users')
 export class UsersController {
-    constructor(private readonly usersService: UsersService) { }
-    
-    @Get()
-    getAll(){
-        return this.usersService.findAll()
-    }
+  constructor(private readonly usersService: UsersService) { }
 
-    @Get(':id')
-    getOne(@Param('id', ParseIntPipe) id: number) {
-        return this.usersService.findOne(id)
-    }
+  @Get()
+  findAll() {
+    return this.usersService.findAll();
+  }
 
-    @Post()
-    @UsePipes(new ValidationPipe({ whitelist: true }))
-    create(@Body() dto: UserDTO) {
-        this.usersService.create(dto)
-        return { message: 'User created successfully' }
-    }
+  @Get(':id')
+  findOne(@Param('id') id: number) {
+    return this.usersService.findOne(id);
+  }
 
-    @Delete(':id')
-    delete (@Param('id', ParseIntPipe) id: number){
-        this.usersService.delete(id)
-        return { message: 'User deleted successfully' }
-    }
+  @Post()
+  create(@Body() userData: Omit<UserDTO, 'id'>) {
+    return this.usersService.create(userData);
+  }
+
+  @Delete(':id')
+  delete(@Param('id') id: number) {
+    return this.usersService.delete(id);
+  }
 }

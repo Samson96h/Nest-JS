@@ -1,20 +1,18 @@
-import { Injectable } from "@nestjs/common";
-import { USERS_DATA } from "src/users_data/users_data";
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { UsersService } from '../users/users.service';
+import { User } from 'src/entityes/user.entity';
 
 @Injectable()
 export class AuthService {
-  public users = USERS_DATA;
+  constructor(private readonly usersService: UsersService) { }
 
-  login(email: string, password: string) {
-    const user = this.users.find(
-      (e) => e.email === email && e.password === password
-    );
-
-    if (!user) {
-      throw new Error("User with such credentials was not found!");
+  async login(email: string, password: string): Promise<Omit<User, 'password'>> {
+    const user = await this.usersService.findByEmail(email);
+    if (!user || user.password !== password) {
+      throw new UnauthorizedException('Invalid email or password');
     }
-
     const { password: _, ...safeUser } = user;
     return safeUser;
   }
+
 }
