@@ -1,9 +1,8 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column} from 'typeorm';
+import { Base } from './base';
 
 @Entity('products')
-export class Product {
-  @PrimaryGeneratedColumn()
-  id: number;
+export class Product extends Base {
 
   @Column({ length: 100 })
   name: string;
@@ -17,6 +16,6 @@ export class Product {
   @Column()
   category: string;
 
-  @Column()
-  in_stock: boolean;
+  @Column({name:"in_stock"})
+  inStock: boolean;
 }

@@ -20,5 +20,9 @@ export class ProductsDTO {
   category: string
 
   @IsBoolean()
-  in_stock: boolean
+  inStock: boolean
+
+  // createdAt:Date - @CreatedDateColum
+  // updatedAt:Date - @updatedDateColum
+  
 }

@@ -1,18 +1,12 @@
-import { IsString, IsInt, Min, Max, IsEmail, IsPhoneNumber, MinLength, IsBoolean, IsEnum, } from 'class-validator';
-import { Type } from 'class-transformer';
-import { UserRole } from 'src/entityes/user.entity';
+import { IsString, IsEmail, MinLength, IsInt, Min, Max, IsPhoneNumber, IsBoolean } from 'class-validator';
 
-export class UserDTO {
-  @IsEnum(['user', 'manager', 'admin'])
-  readonly role: UserRole;
-
+export class RegisterDTO {
   @IsString()
   readonly firstName: string;
 
   @IsString()
   readonly lastName: string;
 
-  @Type(() => Number)
   @IsInt()
   @Min(18)
   @Max(100)
